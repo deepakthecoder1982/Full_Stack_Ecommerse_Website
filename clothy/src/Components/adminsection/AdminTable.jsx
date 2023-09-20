@@ -8,14 +8,17 @@ import {
 } from '@chakra-ui/react';
 import { useEffect,useState } from 'react';
 import axios from 'axios';
+import { URl } from '../../Redux/WomensPageRedux/action';
+import { useSelector } from 'react-redux';
 
 
 const AdminTable = () => {
 
  const [data,setData]=useState([]);
-
-    const getData = (url) => {
-        return axios
+ const {isAuth} = useSelector(store=>store.adminLoginReducer)
+// console.log(isAuth)
+    const getData = async(url) => {
+        return await axios
           .get(url)
           .then((res) => res.data)
           .catch((error) => {
@@ -24,12 +27,19 @@ const AdminTable = () => {
       };
 
       useEffect(()=>{
-        getData("http://localhost:8080/AdminDetail").then((res) => {
+        getData(`${URl}/AdminDetail`).then((res) => {
       setData(res);
 
     });
       },[data?.length]);
-   
+
+import { useDispatch } from 'react-redux';
+import { deleteAdmin, getAdminDetails } from '../../Redux/Admin/action';
+import { DeleteIcon } from "@chakra-ui/icons";
+
+
+const AdminTable = ({data}) => {
+    const dispatcher=useDispatch();
 
     return (
         <Table>
@@ -41,6 +51,8 @@ const AdminTable = () => {
                     <Th>ADMIN EMAIL</Th>
                     <Th>PHONE NO.</Th>
                     <Th>GENDER</Th>
+                    <Th>isActive</Th>
+                    <Th>DELETE</Th>
                 </Tr>
             </Thead>
             <Tbody >
@@ -52,6 +64,14 @@ const AdminTable = () => {
                         <Td>{el.email}</Td>
                         <Td>{el.mobile}</Td>
                         <Td>{el.gender}</Td>
+                        <Td >{el.isAuth?'Active':'Not Active'}</Td>
+                        <Td>
+                        <button onClick={()=>{dispatcher(deleteAdmin(el.id)).then((res)=>{
+                            dispatcher(getAdminDetails());
+                        })}}>
+                            <DeleteIcon boxSize={6} />
+                        </button>
+                    </Td>
                     </Tr>
                 ))}
             </Tbody>

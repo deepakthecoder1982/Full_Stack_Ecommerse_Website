@@ -17,8 +17,7 @@ import {
     useToast,
 } from '@chakra-ui/react'
 import { useDispatch } from 'react-redux';
-import { addAdmin } from '../../Redux/Admin/action';
-
+import { addAdmin, getAdminDetails } from '../../Redux/Admin/action';
 
 
 const initialState = {
@@ -27,6 +26,7 @@ const initialState = {
     password: "",
     gender: "",
     mobile: "",
+    isAuth:false
 };
 
 const reducer = (state, action) => {
@@ -80,7 +80,6 @@ const AddAdmin = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // dispatcher(addProduct(state));
         if (state.password !== confirmPassword || !state.email || !state.name || !state.mobile || !state.gender) {
             toast({
                 title: "Please fill required data",
@@ -91,17 +90,19 @@ const AddAdmin = () => {
                 position: "top",
             });
         } else {
-            dispatcher(addAdmin(state));
-            toast({
-                title: "Sign Up Successful.",
-                description: "Welcome to Clothy.",
-                status: "success",
-                duration: 5000,
-                isClosable: true,
-                position: "top",
-            });
-            dispatch({ type: "reset" });
-            setConfirmPassword("");
+            dispatcher(addAdmin(state)).then(() => {
+                dispatcher(getAdminDetails())
+                dispatch({ type: "reset" });
+                setConfirmPassword("");
+                toast({
+                    title: "Sign Up Successful.",
+                    description: "Welcome to Clothy.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top",
+                });
+            })
         }
     }
 

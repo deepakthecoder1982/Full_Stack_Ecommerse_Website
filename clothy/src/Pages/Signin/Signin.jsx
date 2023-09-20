@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { patchUserData } from "../../Redux/AuthReducer/action";
 import axios from "axios";
 import style from '../OtherPages/style.module.css'
+import { URl } from "../../Redux/WomensPageRedux/action";
 
 const Signin=()=> {
   const [email, setemail] = useState("");
@@ -45,15 +46,13 @@ const Signin=()=> {
   const submitLogin = async () => {
     try {
 
-      let res = await axios("http://localhost:8080/UserDetails");
+      let res = await axios(`${URl}/UserDetails`);
       let Mendata = res.data;
      let UserDetails =   Mendata.find((item)=>{
         return item.email=== email&& item.password===password        
      })
-
-      //console.log(UserDetails)
-      if(UserDetails&&UserDetails.email===email){
-        if(UserDetails.password!==password){
+      if(UserDetails&&UserDetails?.email===email){
+        if(UserDetails?.password!==password){
           toast({
             title: "Login Failed.",
             description: "Wrong Password",
@@ -65,8 +64,8 @@ const Signin=()=> {
         }else{
           loginSuccess();
           dispatch(patchUserData(UserDetails,UserDetails.id)).then(()=>{
-            navigate(`${location.state?location.state:'/'}`);
           })
+          navigate(`${location.state?location.state:'/'}`);
         }
       }else{
         toast({
